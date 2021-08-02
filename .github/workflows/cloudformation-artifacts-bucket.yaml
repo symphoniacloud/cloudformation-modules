@@ -1,0 +1,33 @@
+name: CloudFormationArtifactsBucket
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: cloudformation-artifacts-bucket
+
+# Consider switching this to matrix ... but we're not going to be changing this particularly frequently
+# Or just parallelize in deploy script (probably better)
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.SYMPHONIA_OPENSOURCE_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.SYMPHONIA_OPENSOURCE_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - run: pip install aws-sam-cli
+      - run: pip install cfn-lint
+      # TODO - float this version once bug fixed
+      - run: pip install cloudformation-cli==0.2.12
+      - run: ./publish.sh
