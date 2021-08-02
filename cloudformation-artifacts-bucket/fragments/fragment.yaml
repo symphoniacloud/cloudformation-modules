@@ -1,0 +1,35 @@
+Description: |
+  A bucket to use with cloudformation package, sam deploy, etc.
+  This can be deployed once in an account, and used across all applications.
+  Note that this bucket has a lifecycle policy on it, and so is **not** suitable for long-lived artifacts (e.g. Glue scripts)
+  Provided by Symphonia - https://github.com/symphoniacloud/cloudformation-modules
+
+Outputs:
+  Name:
+    Value: !Ref Bucket
+
+Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'cloudformation-artifacts-${AWS::AccountId}-${AWS::Region}'
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - ExpirationInDays: 7
+            Status: Enabled
+          - NoncurrentVersionExpirationInDays: 1
+            Status: Enabled
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
