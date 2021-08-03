@@ -7,9 +7,6 @@ defaults:
   run:
     working-directory: cloudformation-artifacts-bucket
 
-# Consider switching this to matrix ... but we're not going to be changing this particularly frequently
-# Or just parallelize in deploy script (probably better)
-
 jobs:
   deploy:
     name: Deploy
@@ -26,8 +23,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-      - run: pip install aws-sam-cli
-      - run: pip install cfn-lint
       # TODO - float this version once bug fixed
       - run: pip install cloudformation-cli==0.2.12
       - run: ./publish.sh
